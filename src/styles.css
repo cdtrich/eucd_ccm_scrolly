@@ -1,0 +1,77 @@
+/* general */
+* {
+	font-family: "Source Code Pro", monospace;
+	font-size: 1em;
+}
+
+.dots {
+	/* fill: #000; */
+	pointer-events: all;
+	opacity: 1;
+}
+
+.dots:hover {
+	/* fill: #d82739; */
+	opacity: 0.25;
+	width: 200%;
+}
+
+h1 {
+	font-family: "Source Sans Pro", sans-serif;
+	font-size: 3em;
+	text-transform: uppercase;
+}
+
+.app {
+	/* margin: auto; */
+	margin-bottom: 10em;
+	/* margin-top: 2em; */
+	/* padding: 1em; */
+}
+
+.app .label {
+	font-weight: 900;
+}
+
+.x-axis path {
+	stroke: #fff;
+	stroke-width: 0.5;
+	shape-rendering: crispEdges;
+}
+
+.x-axis {
+	font-size: 1em;
+}
+
+/* .y-axis path {
+	stroke: #aaa;
+	stroke-width: 0.5;
+	shape-rendering: crispEdges;
+} */
+
+.tooltip {
+	/* background: white; */
+	background: rgba(255, 255, 255, 0.95);
+	font-size: 0.8em;
+	/* line-height: 1; */
+	padding: 0px;
+	/* margin-bottom: 0em;
+	margin-top: 0em; */
+	border: 1px solid #dedede;
+	padding: 10px;
+	/* position: relative; positioning for top left! */
+	position: absolute;
+	max-width: 400px;
+	/* visibility: hidden; */
+}
+
+.tooltip > h2 {
+	font-size: 1em;
+}
+
+/* form */
+input,
+label {
+	display: block;
+	margin: 10px 0 0 0;
+}
