@@ -75,20 +75,27 @@
 		</p>
 
 		<!-- dropdown -->
-		<select id="dropdown"></select>
+		<select id="dropdown">
+			<option value=""></option>
+			<option value="attacker_jurisdiction">Attacker jurisdiction</option>
+			<option value="command">Existence of cyber command</option>
+			<option value="military">Ongoing military confrontation</option>
+			<option value="us_me">US military effects</option>
+		</select>
 
 		<!-- <p id="output"></p> -->
 		<!-- tooltip -->
-		<div class="tooltip">
-			<h2></h2>
-			<span class="date"></span>
-			<span class="type"></span>
-			<span class="attacker"></span>
-			<span class="target"></span>
-		</div>
-		<h2></h2>
 
-		<div id="chart" class="app"></div>
+		<div id="chart" class="app">
+			<!-- <div class="tooltip">
+				<h2></h2>
+				<p class="date"></p>
+				<p class="type"></p>
+				<p class="attacker"></p>
+				<p class="target"></p>
+			</div>
+			<h2></h2> -->
+		</div>
 
 		<p class="story">
 			While often such damages are relatively benign, such as downtime of public
@@ -151,6 +158,6 @@
 		</p>
 		<div id="processes" class="app"></div>
 
-		<script type="text/javascript" src="js/script.js"></script>
+		<script type="text/javascript" src="js/script_map.js"></script>
 	</body>
 </html>
