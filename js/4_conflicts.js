@@ -45,16 +45,17 @@ const svg = select("#conflicts") // id app
 	.append("svg")
 	// .attr("width", width)
 	// .attr("height", height)
-	.attr("viewBox", [0, 0, width, height])
+	.attr("viewBox", [-margin.left, 0, width + width - 800, height])
+	// .attr("viewBox", [0, 0, width, height])
 	.style("overflow", "visible");
 
 const colorsType = [
-	"#d82739",
-	"#5ebfbc",
-	"#f28c00",
 	"#113655",
-	"#3C1438",
-	"#53A2BE"
+	"#f28c00",
+	"#3f8ca5",
+	"#fab85f",
+	"#99d4e3",
+	"#fed061"
 ];
 
 // group for voronoi cells
@@ -94,10 +95,10 @@ csv(url, (d) => {
 		),
 		endLabel: d.end_day + "-" + d.End_month + "-" + d.End_year,
 		report: new Date(+d.Report_year, +d.Report_month, +d.Report_day),
-		attacker_jurisdiction: d.Attacker_jurisdiction,
+		attacker_jurisdiction: d.Attack_jurisdiction,
 		target_jurisdiction: d.Target_jurisdiction,
 		victim_jurisdiction: d.Victim_jurisdiction,
-		us_me: d.US_military_effets,
+		us_me: d.US_military_effects,
 		military: d.Ongoing_military_confrontation
 	};
 }).then(function (data) {
@@ -161,14 +162,14 @@ csv(url, (d) => {
 		// 		return sizeScale(d.military);
 		// 	}).strength(0.001)
 		// )
-		.force("charge", forceManyBody().strength(0.05))
-		.force("x", forceX((d) => xScale(d.startYear)).strength(0.99))
+		// .force("charge", forceManyBody().strength(1))
+		.force("x", forceX((d) => xScale(d.startYear)).strength(0.935))
 		.force("y", forceY(height).strength(0.05))
 		// .force(
 		// 	"collide",
 		// 	forceCollide(d => sizeScale(d.radius)).strength(.05)
 		// )
-		.force("collide", forceCollide(radius * 1.5))
+		.force("collide", forceCollide(radius * 1.75))
 		// .force("collide", forceCollide(radius))
 		// .alphaTarget(.05)
 		.stop();
@@ -221,18 +222,18 @@ csv(url, (d) => {
 		.attr("stroke", "white")
 		// tooltip
 		.on("mouseover", (d, i) => {
-			const mouseX = event.pageX;
-			const mouseY = event.pageY;
+			var mouseX = event.pageX + 10;
+			var mouseY = event.pageY + 10;
 			select(".tooltip")
-				.style("left", mouseX + "px")
-				.style("top", mouseY - 28 + "px")
-				.style("opacity", 0)
-				.transition()
-				.duration(100)
+				// .style("left", mouseX + "px")
+				// .style("top", mouseY  + "px")
+				// .style("opacity", 0)
+				// .transition()
+				// .duration(100)
 				.style("visibility", "visible")
 				.style("opacity", 1)
 				.style("left", mouseX + "px")
-				.style("top", mouseY - 28 + "px");
+				.style("top", mouseY + "px");
 			// console.log(d);
 			// name
 			select(".tooltip h2").text(d.name);
@@ -247,8 +248,48 @@ csv(url, (d) => {
 			// victim
 			select(".tooltip .target").text("target: " + d.name);
 		})
+		.on("mousemove", (d, i) => {
+			const mouseX = event.pageX + 10;
+			const mouseY = event.pageY + 10;
+			select(".tooltip")
+				.style("left", mouseX + "px")
+				.style("top", mouseY + "px");
+		})
 		.on("mouseout", function (d) {
 			select(".tooltip").style("visibility", "hidden");
+		});
+
+	///////////////////////////////////////////////////////////////////////////
+	//////////////////////////// legend ///////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////
+
+	var legend = svg
+		.selectAll(".legend")
+		.data(colorScale.domain())
+		.enter()
+		.append("g")
+		.attr("class", "legend")
+		.attr("transform", function (d, i) {
+			return "translate(" + (i * width) / 8 + ",20)";
+		});
+
+	legend
+		.append("circle")
+		.attr("cx", 200)
+		.attr("cy", 0)
+		.attr("r", radius / 4)
+		// .attr("width", 18)
+		// .attr("height", 18)
+		.style("fill", colorScale);
+
+	legend
+		.append("text")
+		.attr("x", 210)
+		.attr("y", 0)
+		.attr("dy", ".35em")
+		.style("text-anchor", "start")
+		.text(function (d) {
+			return d;
 		});
 
 	///////////////////////////////////////////////////////////////////////////

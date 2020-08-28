@@ -32,6 +32,16 @@
 	</head>
 
 	<body>
+		<!-- <p id="output"></p> -->
+		<!-- tooltip -->
+		<div class="tooltip hidden">
+			<h2></h2>
+			<p class="date"></p>
+			<p class="type"></p>
+			<p class="attacker"></p>
+			<p class="target"></p>
+		</div>
+		<h2></h2>
 		<!-- <form>
 			<label for="circles">circles written</label>
 			<select id="circles">
@@ -73,29 +83,61 @@
 			Since 2007, in more than twenty occasions, states or state-sponsored
 			actors have inflicted damage on another state using ICTs.
 		</p>
-
-		<!-- dropdown -->
-		<select id="dropdown">
-			<option value=""></option>
-			<option value="attacker_jurisdiction">Attacker jurisdiction</option>
-			<option value="command">Existence of cyber command</option>
-			<option value="military">Ongoing military confrontation</option>
-			<option value="us_me">US military effects</option>
-		</select>
-
-		<!-- <p id="output"></p> -->
-		<!-- tooltip -->
-
-		<div id="chart" class="app">
-			<!-- <div class="tooltip">
-				<h2></h2>
-				<p class="date"></p>
-				<p class="type"></p>
-				<p class="attacker"></p>
-				<p class="target"></p>
-			</div>
-			<h2></h2> -->
+		<div id="timeline_general" class="app">
+			<div id="details" class="hidden row"><!-- Details container --></div>
 		</div>
+		<p class="definition" text-align="right">
+			[click dots for details, dblclick to close details]
+		</p>
+
+		<!-- Mustache template, rendered later to show the details of a feature -->
+		<script id="template" type="x-tmpl-mustache">
+			<!-- <h1 class="six columns">{{ name }}</h1> -->
+				<table class="five columns">
+					<tr>
+						<th>{{ name }}</th>
+					</tr>
+					<tr>
+						<td class="definition" colspan="2">We have used the most common/frequentky used name  and avoided entirely descriptive names. If the name derives from another name (Estonia, Georgia), we have added relevant year number.</td>
+					</tr>
+					<tr>
+						<th>{{ reportDay }}-{{ reportMonth }}-{{ reportYear }}</th>
+					</tr>
+					<tr>
+						<td class="definition" colspan="2">Report Date: Known first time of reporting of the operation.</td>
+					</tr>
+					<tr>
+						<th>{{ attacker_jurisdiction }}</th>
+					</tr>
+					<tr colspan="3">
+						<td class="definition" colspan="2">Attack jurisdiction: Jurisdiction primarily associated with the operation</td>
+					</tr>
+					<tr>
+						<th>{{ target_jurisdiction }}</th>
+					</tr>
+					<tr>
+						<td class="definition" colspan="2">Target jurisdiction: Jurisdiction primarily affected by the operation</td>
+					</tr>
+					<tr>
+						<th>{{ command }}</th>
+					</tr>
+					<tr>
+						<td class="definition" colspan="2">Attack cyber command: Existence of the cyber command or equivalent in the jurisdiction primariy associated with the operation  at the time of the operation.</td>
+					</tr>
+					<tr>
+						<th>{{ military }}</th>
+					</tr>
+					<tr>
+						<td class="definition" colspan="2">Ongoing military confrontation: Indicates the level and likelihood of use of destructive military power in the dyadic relationships. Military confrontation is active where frequent hostilities and destructive power are used between the rivals. Latent refers to where escalation and the use of destructive (military) power is likely. Frozen conflict means that the use of destructive power is settled by temporary, formal arrangement or de facto understanding.</td>
+					</tr>
+						<th>{{ us_me }}</th>
+					</tr>
+					<tr>
+						<td class="definition" colspan="2">US military effects: This classification comprises manipulation, denial (in form of disruption and degradation) and destruction.</td>
+					</tr>
+				</table>
+				<!-- <a href="#" id="close-details" class="one column" onclick="hideDetails(); return false;">&#x274c;</a> -->
+		</script>
 
 		<p class="story">
 			While often such damages are relatively benign, such as downtime of public
@@ -107,11 +149,12 @@
 		<div id="timeline_usme" class="app"></div>
 
 		<h1>Sectors</h1>
+
 		<p class="story">
 			Most affected by cyber operations is the financial sector. Cyber
 			operations also affect manufacturing processes, disrupt the supply of
 			electricity and public transportation. States have disrupted fuel supply
-			and targeted nuclear facilities.
+			and targeted nuclear facilities. destruction of data.
 		</p>
 		<!-- <div id="sectors" class="app"></div> -->
 
@@ -125,29 +168,22 @@
 		</p>
 		<div id="conflicts" class="app"></div>
 
-		<p class="story">
-			Scholars have noted the dyadic nature of cyber conflict – in most
-			instances, cyber operations are situated in pre-existing political
-			tensions. However, for some states, ICTs offer a new opportunity to engage
-			in operations against their rivals.
-		</p>
-		<div id="command" class="app"></div>
-
-		<h1>Proxies</h1>
-		<p class="story">
-			Even states with established cyber commands rely on proxy actors when
-			carrying out cyber operations.
-		</p>
-		<div id="proxies" class="app"></div>
-
 		<h1>Dyads</h1>
 		<p class="story">
 			Scholars have noted the dyadic nature of cyber conflict – in most
 			instances, cyber operations are situated in pre-existing political
 			tensions. However, for some states, ICTs offer a new opportunity to engage
-			in operations against their rivals.
+			in operations against their rivals. have established a cyber command.
 		</p>
-		<div id="dyads" class="app"></div>
+		<!-- <div id="command" class="app"></div> -->
+		<!-- <div id="dyads" class="app"></div> -->
+
+		<h1>Proxies</h1>
+		<p class="story">
+			Even states with established cyber commands rely on proxy actors when
+			carrying out cyber operations. in operations against their rivals.
+		</p>
+		<!-- <div id="proxies" class="app"></div> -->
 
 		<h1>Processes</h1>
 		<p class="story">
@@ -156,8 +192,16 @@
 			time, these dialogues do not include other countries frequently engaging
 			in cyber operations.
 		</p>
-		<div id="processes" class="app"></div>
+		<!-- <div id="processes" class="app"></div> -->
 
-		<script type="text/javascript" src="js/script_map.js"></script>
+		<script type="text/javascript" src="js/data.js"></script>
+		<script type="text/javascript" src="js/1_timeline_general.js"></script>
+		<script type="text/javascript" src="js/2_timeline_usme.js"></script>
+		<!-- <script type="text/javascript" src="js/3_sectors.js"></script> -->
+		<script type="text/javascript" src="js/4_conflicts.js"></script>
+		<!-- <script type="text/javascript" src="js/5_command.js"></script> -->
+		<!-- <script type="text/javascript" src="js/6_dyads.js"></script> -->
+		<!-- <script src="./js/7_proxies.js"></script> -->
+		<!-- <script src="./js/8_processes.js"></script> -->
 	</body>
 </html>

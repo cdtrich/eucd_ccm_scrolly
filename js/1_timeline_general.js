@@ -34,6 +34,10 @@ import { replace } from "lodash";
 // import fetch as d3-fetch from "d3-fetch";
 import { csv } from "d3-fetch";
 
+// import mustache
+// https://github.com/janl/mustache.js
+const Mustache = require("mustache");
+
 ///////////////////////////////////////////////////////////////////////////
 //////////////////////////// Set up svg ///////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
@@ -48,7 +52,8 @@ const svg = select("#timeline_general") // id app
 	.append("svg")
 	// .attr("width", width)
 	// .attr("height", height)
-	.attr("viewBox", [0, 0, width, height])
+	.attr("viewBox", [-margin.left, 0, width + width - 800, height])
+	// .attr("viewBox", [0, 0, width, height])
 	.style("overflow", "visible");
 
 // group for voronoi cells
@@ -57,6 +62,10 @@ const svg = select("#timeline_general") // id app
 // 	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 // const t = d3.transition().duration(1500);
+
+// template
+var template = select("#template").html();
+Mustache.parse(template);
 
 const url =
 	// "https://docs.google.com/spreadsheets/d/e/2PACX-1vS_852u619EmtHZE3p4sq7ZXwfrtxhOc1IlldXIu7z43OFVTtVZ1A577RbfgZEnzVhM_X0rnkGzxytz/pub?gid=0&single=true&output=csv";
@@ -86,12 +95,23 @@ csv(url, (d) => {
 			+d.End_month - 1,
 			replace(d.End_day, "unknown", 1)
 		),
-		endLabel: d.end_day + "-" + d.End_month + "-" + d.End_year,
+		endLabel: d.End_day + "-" + d.End_month + "-" + d.End_year,
 		report: new Date(+d.Report_year, +d.Report_month, +d.Report_day),
-		attacker_jurisdiction: d.Attacker_jurisdiction,
+		reportDay: +d.Report_day,
+		reportMonth: +d.Report_month,
+		reportYear: +d.Report_year,
+		reportFix: new Date(
+			+d.Report_year,
+			+d.Report_month - 1,
+			replace(d.Report_day, "unknown", 1)
+		),
+		reportLabel: d.Report_day + "-" + d.Report_month + "-" + d.Report_year,
+		attacker_jurisdiction: d.Attack_jurisdiction,
 		target_jurisdiction: d.Target_jurisdiction,
 		victim_jurisdiction: d.Victim_jurisdiction,
-		us_me: d.US_military_effets
+		military: d.Ongoing_military_confrontation,
+		command: d.Attack_cyber_command.trim(),
+		us_me: d.US_military_effects
 	};
 }).then(function (data) {
 	// console.log(data);
@@ -189,20 +209,21 @@ csv(url, (d) => {
 		.attr("r", radius)
 		.attr("cx", (d) => d.x)
 		.attr("cy", (d) => d.y)
+		.attr("fill", "#3f8ca5")
 		// tooltip
 		.on("mouseover", (d, i) => {
-			const mouseX = event.pageX;
-			const mouseY = event.pageY;
+			var mouseX = event.pageX + 10;
+			var mouseY = event.pageY + 10;
 			select(".tooltip")
-				.style("left", mouseX + "px")
-				.style("top", mouseY - 28 + "px")
-				.style("opacity", 0)
-				.transition()
-				.duration(100)
+				// .style("left", mouseX + "px")
+				// .style("top", mouseY  + "px")
+				// .style("opacity", 0)
+				// .transition()
+				// .duration(100)
 				.style("visibility", "visible")
 				.style("opacity", 1)
 				.style("left", mouseX + "px")
-				.style("top", mouseY - 28 + "px");
+				.style("top", mouseY + "px");
 			// console.log(d);
 			// name
 			select(".tooltip h2").text(d.name);
@@ -217,9 +238,17 @@ csv(url, (d) => {
 			// victim
 			select(".tooltip .target").text("target: " + d.name);
 		})
+		.on("mousemove", (d, i) => {
+			const mouseX = event.pageX + 10;
+			const mouseY = event.pageY + 10;
+			select(".tooltip")
+				.style("left", mouseX + "px")
+				.style("top", mouseY + "px");
+		})
 		.on("mouseout", function (d) {
 			select(".tooltip").style("visibility", "hidden");
-		});
+		})
+		.on("click", showDetails);
 
 	///////////////////////////////////////////////////////////////////////////
 	//////////////////////////// axes /////////////////////////////////////////
@@ -236,3 +265,28 @@ csv(url, (d) => {
 		.attr("transform", "translate(0," + height + ")")
 		.call(xAxis);
 });
+
+///////////////////////////////////////////////////////////////////////////
+//////////////////////////// details //////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
+
+function showDetails(f) {
+	var detailsHtml = Mustache.render(template, f);
+	// Hide the initial container.
+	select("#initial").classed("hidden", true);
+	// Put the HTML output in the details container and show (unhide) it.
+	select("#details").html(detailsHtml);
+	select("#details").classed("hidden", false);
+	select("#details").on("click", hideDetails);
+}
+
+function hideDetails() {
+	// Hide the details
+	// select("#details").attr("display", "none");
+	select("#details").classed("hidden", true);
+	// Show the initial content
+	// select("#initial").attr("display", "none");
+	select("#initial").classed("hidden", false);
+}
+
+// select(HTMLAnchorElement).on("click", hideDetails);

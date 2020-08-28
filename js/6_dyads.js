@@ -92,8 +92,8 @@ csv(url, (d) => {
 		victim_jurisdiction: d.Victim_jurisdiction,
 		dyad_from: split(d.Dyad, "-")[0],
 		dyad_to: split(d.Dyad, "-")[1],
-		command: d.Existence_of_Cyber_Command.trimEnd(),
-		us_me: d.US_military_effets
+		command: d.Attack_cyber_command.trimEnd(),
+		us_me: d.US_military_effects
 	};
 }).then(function (data) {
 	// console.log(data);

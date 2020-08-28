@@ -2,6 +2,11 @@
 //////////////////////////// to do ////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
+// xaxis annual ticks
+// linerange (d3.line x.begin x.end?!)...
+// labels()
+// hover
+// dropdown selection
 // load data at end as global var after plot function
 
 ///////////////////////////////////////////////////////////////////////////
@@ -11,10 +16,9 @@
 // import * as d3 from "d3";
 import {
 	select,
-	// extent,
+	extent,
+	scaleLinear,
 	// timeFormat,
-	scaleOrdinal,
-	// scaleBand,
 	axisBottom,
 	format,
 	forceSimulation,
@@ -25,7 +29,7 @@ import {
 
 // import _ from "lodash";
 // Load the core build.
-import { replace, chain, transform } from "lodash";
+import { replace } from "lodash";
 
 // import fetch as d3-fetch from "d3-fetch";
 import { csv } from "d3-fetch";
@@ -38,21 +42,15 @@ const width = 1200;
 const height = 300;
 const radius = 15;
 const margin = { top: 20, right: 20, bottom: 20, left: 120 };
-const svg = select("#sectors") // id app
+// const svg = d3.create("svg")
+// .attr("viewBox", [0, 0, width, height]);
+const svg = select("#timeline_general") // id app
 	.append("svg")
 	// .attr("width", width)
 	// .attr("height", height)
-	.attr("viewBox", [0, 0, width, height])
+	.attr("viewBox", [-margin.left, 0, width + width - 800, height])
+	// .attr("viewBox", [0, 0, width, height])
 	.style("overflow", "visible");
-
-const colorsType = [
-	"#d82739",
-	"#5ebfbc",
-	"#f28c00",
-	"#113655",
-	"#3C1438",
-	"#53A2BE"
-];
 
 // group for voronoi cells
 // var g = svg
@@ -89,28 +87,19 @@ csv(url, (d) => {
 			+d.End_month - 1,
 			replace(d.End_day, "unknown", 1)
 		),
-		endLabel: d.end_day + "-" + d.End_month + "-" + d.End_year,
+		endLabel: d.End_day + "-" + d.End_month + "-" + d.End_year,
 		report: new Date(+d.Report_year, +d.Report_month, +d.Report_day),
-		attacker_jurisdiction: d.Attacker_jurisdiction,
+		attacker_jurisdiction: d.Attack_jurisdiction,
 		target_jurisdiction: d.Target_jurisdiction,
 		victim_jurisdiction: d.Victim_jurisdiction,
-		us_me: d.US_military_effets,
-		military: d.Ongoing_military_confrontation,
-		sector_i: d.Target_CI_sector.trim(),
-		sector_ii: d.Target_CI_sector_II.trim(),
-		sector_iii: d.Target_CI_sector_III.trim()
+		us_me: d.US_military_effects
 	};
 }).then(function (data) {
 	// console.log(data);
 	// data = _.head(data);
 
 	// crappy stuxnet fix
-	// data = chain(data).filter(d => d.startYear == 2010).assignWith()
-	data = chain(data)
-		.merge((d) => (d.sector_i, d.sector_ii, d.sector_iii))
-		.value();
-	// data[3].startYear = 2010;
-	// console.log(data);
+	data[3].startYear = 2010;
 
 	///////////////////////////////////////////////////////////////////////////
 	//////////////////////////// data table ///////////////////////////////////
@@ -125,65 +114,35 @@ csv(url, (d) => {
 	// var formatDate = timeFormat("%d %b %Y");
 
 	///////////////////////////////////////////////////////////////////////////
-	//////////////////////////// data /////////////////////////////////////////
-	///////////////////////////////////////////////////////////////////////////
-
-	// var sector = data;
-
-	var sectorUnique = chain(data)
-		.map((d) => [d.sector_i, d.sector_ii, d.sector_iii])
-		.flatten()
-		.uniq()
-		.filter((d) => {
-			return d !== "no" && d !== "N/A";
-		})
-		.value();
-	// console.log(sectorUnique);
-
-	// const obj = nodesUnique.reduce((array, value, index) => ({ ...array, [index]: value }), {});
-
-	// sectorUnique = sectorUnique.map((d) => {
-	// 	return { id: d };
-	// });
-	// console.log(sectorUnique);
-
-	///////////////////////////////////////////////////////////////////////////
 	//////////////////////////// scales ///////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////
 
-	const xScale = scaleOrdinal()
-		.domain(sectorUnique)
+	const xScale = scaleLinear()
+		.domain(
+			extent(data, (d) => {
+				return d.startYear;
+			})
+		)
 		.range([margin.left, width - margin.right]);
 
-	const dataSector = // chain(data)
-		// .map((d) => [d.sector_i, d.sector_ii, d.sector_iii]);
-		transform(
-			data,
-			function (result, value, key) {
-				return result.sector_i || result.sector_iI || result.sector_iii;
-			},
-			{}
-		);
-	// .uniq()
-	// .value();
-	// console.log(transform(data, function(d, i) {
-	//   return (d.sector_i || d.sector_ii || d.sector_iii).push(i);
-	// }, {}));
-	// console.log(dataSector);
+	// console.log(xScale.domain(), xScale.range());
 
-	const colorScale = scaleOrdinal().domain(dataSector).range(colorsType);
-	// console.log(colorScale.domain(), colorScale.range());
-
-	// can these be clustered? https://bl.ocks.org/mbostock/1748247
 	var simulation = forceSimulation(data)
-		.force("x", forceX((d) => xScale(d.id)).strength(0.99))
+		.force(
+			"x",
+			forceX(function (d) {
+				return xScale(d.startYear);
+			}).strength(0.99)
+		)
 		.force("y", forceY(height).strength(0.05))
 		.force("collide", forceCollide(radius))
 		.stop();
+	// this crashes
+	// .alphaDecay(0)
+	// .alpha(0.12)
+	// .on('tick', tick);
 
 	for (var i = 0; i < 10; ++i) simulation.tick();
-
-	// console.log(data);
 
 	///////////////////////////////////////////////////////////////////////////
 	//////////////////////////// plot /////////////////////////////////////////
@@ -212,7 +171,15 @@ csv(url, (d) => {
 	// 	.enter()
 	// 	.append("g");
 
+	// bouncy dots from here https://bl.ocks.org/maegul/7d8e7342c649fdc077a6984e52da4b62
+	// function tick() {
+	// 	selectAll(".dots")
+	// 		.attr("cx", (d) => d.x)
+	// 		.attr("cy", (d) => d.y);
+	// };
+
 	// dots
+
 	const dots = svg
 		.selectAll(".dots")
 		.data(data)
@@ -223,22 +190,21 @@ csv(url, (d) => {
 		.attr("r", radius)
 		.attr("cx", (d) => d.x)
 		.attr("cy", (d) => d.y)
-		.attr("fill", (d) => colorScale(d.sector))
-		// .attr("stroke", "white")
+		.attr("fill", "#3f8ca5")
 		// tooltip
 		.on("mouseover", (d, i) => {
-			const mouseX = event.pageX;
-			const mouseY = event.pageY;
+			var mouseX = event.pageX + 10;
+			var mouseY = event.pageY + 10;
 			select(".tooltip")
-				.style("left", mouseX + "px")
-				.style("top", mouseY - 28 + "px")
-				.style("opacity", 0)
-				.transition()
-				.duration(100)
+				// .style("left", mouseX + "px")
+				// .style("top", mouseY  + "px")
+				// .style("opacity", 0)
+				// .transition()
+				// .duration(100)
 				.style("visibility", "visible")
 				.style("opacity", 1)
 				.style("left", mouseX + "px")
-				.style("top", mouseY - 28 + "px");
+				.style("top", mouseY + "px");
 			// console.log(d);
 			// name
 			select(".tooltip h2").text(d.name);
@@ -253,14 +219,23 @@ csv(url, (d) => {
 			// victim
 			select(".tooltip .target").text("target: " + d.name);
 		})
+		.on("mousemove", (d, i) => {
+			const mouseX = event.pageX + 10;
+			const mouseY = event.pageY + 10;
+			select(".tooltip")
+				.style("left", mouseX + "px")
+				.style("top", mouseY + "px");
+		})
 		.on("mouseout", function (d) {
 			select(".tooltip").style("visibility", "hidden");
-		});
+		})
+		.on("click", function (d) {});
 
 	///////////////////////////////////////////////////////////////////////////
 	//////////////////////////// axes /////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////
 
+	// axes
 	var formatAxis = format(".4r");
 
 	const xAxis = axisBottom().scale(xScale).tickFormat(formatAxis);

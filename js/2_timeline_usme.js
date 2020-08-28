@@ -22,7 +22,7 @@ import {
 	scaleBand,
 	scaleOrdinal,
 	line as _line,
-	curveBasis,
+	mouse,
 	axisBottom,
 	axisLeft,
 	format,
@@ -34,7 +34,7 @@ import {
 
 // import _ from "lodash";
 // Load the core build.
-import { filter, chain, replace } from "lodash";
+import { forEach, chain, replace } from "lodash";
 
 // import fetch as d3-fetch from "d3-fetch";
 import { csv } from "d3-fetch";
@@ -51,17 +51,20 @@ const svg = select("#timeline_usme") // id app
 	.append("svg")
 	// .attr("width", width)
 	// .attr("height", height)
-	.attr("viewBox", [0, 0, width, height])
+	// .attr("viewBox", [margin.left, 0, width * 1.5 , height])
+	.attr("viewBox", [-margin.left, 0, width + width - 800, height])
 	// .attr("viewBox", [-width / 2, -height / 2, width, height])
 	.style("overflow", "visible");
 
+var tooltip = select("#chart").append("div").attr("class", "tooltip hidden");
+
 const colorsType = [
-	"#d82739",
-	"#5ebfbc",
-	"#f28c00",
 	"#113655",
-	"#3C1438",
-	"#53A2BE"
+	"#f28c00",
+	"#3f8ca5",
+	"#fab85f",
+	"#99d4e3",
+	"#fed061"
 ];
 
 // const t = d3.transition().duration(1500);
@@ -81,32 +84,34 @@ csv(url, (d) => {
 		name: d.Name,
 		start: new Date(+d.Start_year, +d.Start_month - 1, +d.Start_day),
 		startYear: +d.Start_year,
-		startFix: new Date(
-			+d.Start_year,
-			+d.Start_month - 1,
-			replace(d.Start_day, "unknown", 1)
-		),
+		// startFix: new Date(
+		// 	+d.Start_year,
+		// 	+d.Start_month - 1,
+		// 	replace(d.Start_day, "unknown", 1)
+		// ),
 		startLabel: d.Start_day + "-" + d.Start_month + "-" + d.Start_year,
 		end: new Date(+d.End_year, +d.End_month, +d.end_day),
 		endYear: +d.End_year,
-		endFix: new Date(
-			+d.End_year,
-			+d.End_month - 1,
-			replace(d.End_day, "unknown", 1)
-		),
+		// endFix: new Date(
+		// 	+d.End_year,
+		// 	+d.End_month - 1,
+		// 	replace(d.End_day, "unknown", 1)
+		// ),
 		endLabel: d.end_day + "-" + d.End_month + "-" + d.End_year,
 		report: new Date(+d.Report_year, +d.Report_month, +d.Report_day),
-		attacker_jurisdiction: d.Attacker_jurisdiction,
+		attacker_jurisdiction: d.Attack_jurisdiction,
 		target_jurisdiction: d.Target_jurisdiction,
 		victim_jurisdiction: d.Victim_jurisdiction,
 		us_me: d.US_military_effects
 	};
 }).then(function (data) {
-	// console.log(data);
+	console.log(data);
 	// data = _.head(data);
 
 	// crappy stuxnet fix
-	data[3].startYear = 2010;
+	data = forEach(data, function (value) {
+		value.startYear = value.name === "Stuxnet" ? 2010 : value.startYear;
+	});
 
 	///////////////////////////////////////////////////////////////////////////
 	//////////////////////////// data table ///////////////////////////////////
@@ -179,85 +184,6 @@ csv(url, (d) => {
 	// console.log(colorScale.domain(), colorScale.range());
 
 	///////////////////////////////////////////////////////////////////////////
-	//////////////////////////// plot /////////////////////////////////////////
-	///////////////////////////////////////////////////////////////////////////
-
-	// lines
-	// var line = _line()
-	// 	.curve(curveBasis)
-	// 	.x((d) => xScale(d.startYear))
-	// 	.y((d) => yScale(d.attacker_jurisdiction));
-
-	// var linerange = svg
-	// 	.selectAll("path.linerange")
-	// 	.data(data)
-	// 	.enter()
-	// 	.append("g")
-	// 	.attr("class", "linerange");
-
-	// linerange
-	// 	.append("path")
-	// 	.attr("d", function (d) {
-	// 		return line(d.attacker_jurisdiction);
-	// 	})
-	// 	.attr("id", (d) => d.attacker_jurisdiction);
-
-	// labels
-	// const labels = svg
-	// 	.selectAll("label")
-	// 	.data(data)
-	// 	.enter()
-	// 	.append("text")
-	// 	.classed("label", true)
-	// 	.text((d) => d.name)
-	// 	.attr("x", (d) => xScale(d.startYear) + radius)
-	// 	.attr("y", (d) => yScale(d.attacker_jurisdiction) + 15);
-
-	// dots
-	const dots = svg
-		.selectAll("dots")
-		.data(data)
-		.enter()
-		.append("circle")
-		.attr("class", "dots")
-		.attr("r", radius)
-		.attr("cx", (d) => d.x)
-		// y position needs some adjusting. why???
-		.attr("cy", (d) => d.y + 20)
-		.attr("fill", (d) => colorScale(d.us_me))
-		// tooltip
-		.on("mouseover", (d, i) => {
-			const mouseX = event.pageX;
-			const mouseY = event.pageY;
-			select(".tooltip")
-				.style("left", mouseX + "px")
-				.style("top", mouseY - 28 + "px")
-				.style("opacity", 0)
-				.transition()
-				.duration(100)
-				.style("visibility", "visible")
-				.style("opacity", 1)
-				.style("left", mouseX + "px")
-				.style("top", mouseY - 28 + "px");
-			// console.log(d);
-			// name
-			select(".tooltip h2").text(d.name);
-			// date
-			select(".tooltip .date").text(
-				"from " + d.startLabel + " to " + d.endLabel
-			);
-			// name
-			select(".tooltip .type").text("type: " + d.us_me);
-			// attacker
-			select(".tooltip .attacker").text("attacker: " + d.attacker_jurisdiction);
-			// victim
-			select(".tooltip .target").text("target: " + d.name);
-		})
-		.on("mouseout", function (d) {
-			select(".tooltip").style("visibility", "hidden");
-		});
-
-	///////////////////////////////////////////////////////////////////////////
 	//////////////////////////// axes /////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////
 
@@ -277,7 +203,99 @@ csv(url, (d) => {
 		.append("g")
 		.classed("y-axis", true)
 		.attr("transform", `translate(${margin.left}, 0)`) // no transformation in x, but in y
+		// .attr("color", "#eee")
 		.call(yAxis)
 		.select(".domain") // axis line is classed as .domain by default (check html); created by .call() above, .remove() after will drop it
 		.remove();
+
+	///////////////////////////////////////////////////////////////////////////
+	//////////////////////////// plot /////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////
+
+	// dots
+	const dots = svg
+		.selectAll("dots")
+		.data(data)
+		.enter()
+		.append("circle")
+		.attr("class", "dots")
+		.attr("r", radius)
+		.attr("cx", (d) => d.x)
+		// y position needs some adjusting. why???
+		.attr("cy", (d) => d.y + 20)
+		.attr("fill", (d) => colorScale(d.us_me))
+		// tooltip
+		// .on("mouseover", showTooltip)
+		// .on("mousemove", moveTooltip)
+		// .on("mouseout", hideTooltip);
+		.on("mouseover", (d, i) => {
+			var mouseX = event.pageX + 10;
+			var mouseY = event.pageY + 10;
+			select(".tooltip")
+				// .style("left", mouseX + "px")
+				// .style("top", mouseY  + "px")
+				// .style("opacity", 0)
+				// .transition()
+				// .duration(100)
+				.style("visibility", "visible")
+				.style("opacity", 1)
+				.style("left", mouseX + "px")
+				.style("top", mouseY + "px");
+			// console.log(d);
+			// name
+			select(".tooltip h2").text(d.name);
+			// date
+			select(".tooltip .date").text(
+				"from " + d.startLabel + " to " + d.endLabel
+			);
+			// name
+			select(".tooltip .type").text("type: " + d.us_me);
+			// attacker
+			select(".tooltip .attacker").text("attacker: " + d.attacker_jurisdiction);
+			// victim
+			select(".tooltip .target").text("target: " + d.name);
+		})
+		.on("mousemove", (d, i) => {
+			const mouseX = event.pageX + 10;
+			const mouseY = event.pageY + 10;
+			select(".tooltip")
+				.style("left", mouseX + "px")
+				.style("top", mouseY + "px");
+		})
+		.on("mouseout", function (d) {
+			select(".tooltip").style("visibility", "hidden");
+		});
+
+	///////////////////////////////////////////////////////////////////////////
+	//////////////////////////// legend ///////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////
+
+	var legend = svg
+		.selectAll(".legend")
+		.data(colorScale.domain())
+		.enter()
+		.append("g")
+		.attr("class", "legend")
+		.attr("transform", function (d, i) {
+			return "translate(" + (i * width) / 8 + ",20)";
+		});
+
+	legend
+		.append("circle")
+		.attr("cx", 200)
+		.attr("cy", 0)
+		.attr("r", radius / 4)
+		// .attr("width", 18)
+		// .attr("height", 18)
+		.style("fill", colorScale);
+
+	legend
+		.append("text")
+		.attr("x", 210)
+		.attr("y", 0)
+		.attr("dy", ".35em")
+		.style("text-anchor", "start")
+		.text(function (d) {
+			return d;
+		});
 });

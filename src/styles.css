@@ -24,7 +24,8 @@ h1 {
 
 .app {
 	/* margin: auto; */
-	margin-bottom: 10em;
+	margin-top: 3em;
+	margin-bottom: 5em;
 	/* margin-top: 2em; */
 	/* padding: 1em; */
 }
@@ -52,12 +53,12 @@ h1 {
 .tooltip {
 	/* background: white; */
 	background: rgba(255, 255, 255, 0.95);
-	font-size: 0.8em;
+	font-size: 0.65em;
 	/* line-height: 1; */
 	padding: 0px;
 	/* margin-bottom: 0em;
 	margin-top: 0em; */
-	border: 1px solid #dedede;
+	border: 0px solid #fff;
 	padding: 10px;
 	/* position: relative; positioning for top left! */
 	position: absolute;
@@ -67,6 +68,76 @@ h1 {
 
 .tooltip > h2 {
 	font-size: 1em;
+}
+
+.hidden {
+	opacity: 0;
+}
+
+/* details */
+
+/* #details row {
+	background: red;
+
+} */
+
+#details,
+#initial {
+	float: left;
+	width: 33%;
+	height: 100%;
+	position: fixed;
+	/* vertical-align: center; */
+	bottom: 0;
+	left: 0;
+	background: white;
+	margin-top: 2rem;
+	box-shadow: 0.5rem 0rem 2rem #eee;
+}
+
+table {
+	margin-bottom: 0;
+	/* overflow-x: auto; */
+	table-layout: 1 2;
+	/* table-layout: fixed; */
+	vertical-align: top;
+}
+td,
+th {
+	padding: 6px 9px;
+	font-weight: normal;
+}
+td {
+	text-align: left;
+	color: #000;
+}
+
+tr:hover {
+	background-color: #f5f5f5;
+}
+
+table {
+	text-align: left;
+}
+
+.definition {
+	font-size: 0.75em;
+	color: #aaa;
+	text-align: left;
+	border-bottom: 1px solid #eee;
+	padding-top: 0em;
+	padding-bottom: 0.1em;
+}
+
+#close-details {
+	color: black;
+	text-decoration: none;
+	/* font-size: 4rem; */
+	/* text-align: right; */
+	/* line-height: 4.5rem; */
+}
+#close-details:hover {
+	color: 000;
 }
 
 /* form */

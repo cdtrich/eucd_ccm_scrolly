@@ -97,12 +97,12 @@ csv(url, (d) => {
 		),
 		endLabel: d.end_day + "-" + d.End_month + "-" + d.End_year,
 		report: new Date(+d.Report_year, +d.Report_month, +d.Report_day),
-		attacker_jurisdiction: d.Attacker_jurisdiction,
+		attacker_jurisdiction: d.Attack_jurisdiction,
 		target_jurisdiction: d.Target_jurisdiction,
 		victim_jurisdiction: d.Victim_jurisdiction,
-		us_me: d.US_military_effets,
+		us_me: d.US_military_effects,
 		military: d.Ongoing_military_confrontation,
-		command: d.Existence_of_Cyber_Command.trim()
+		command: d.Attack_cyber_command.trim()
 	};
 }).then(function (data) {
 	// console.log(data);
@@ -197,18 +197,18 @@ csv(url, (d) => {
 		// .attr("stroke", "white")
 		// tooltip
 		.on("mouseover", (d, i) => {
-			const mouseX = event.pageX;
-			const mouseY = event.pageY;
+			var mouseX = event.pageX + 10;
+			var mouseY = event.pageY + 10;
 			select(".tooltip")
-				.style("left", mouseX + "px")
-				.style("top", mouseY - 28 + "px")
-				.style("opacity", 0)
-				.transition()
-				.duration(100)
+				// .style("left", mouseX + "px")
+				// .style("top", mouseY  + "px")
+				// .style("opacity", 0)
+				// .transition()
+				// .duration(100)
 				.style("visibility", "visible")
 				.style("opacity", 1)
 				.style("left", mouseX + "px")
-				.style("top", mouseY - 28 + "px");
+				.style("top", mouseY + "px");
 			// console.log(d);
 			// name
 			select(".tooltip h2").text(d.name);
@@ -223,8 +223,48 @@ csv(url, (d) => {
 			// victim
 			select(".tooltip .target").text("target: " + d.name);
 		})
+		.on("mousemove", (d, i) => {
+			const mouseX = event.pageX + 10;
+			const mouseY = event.pageY + 10;
+			select(".tooltip")
+				.style("left", mouseX + "px")
+				.style("top", mouseY + "px");
+		})
 		.on("mouseout", function (d) {
 			select(".tooltip").style("visibility", "hidden");
+		});
+
+	///////////////////////////////////////////////////////////////////////////
+	//////////////////////////// legend ///////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////
+
+	var legend = svg
+		.selectAll(".legend")
+		.data(colorScale.domain())
+		.enter()
+		.append("g")
+		.attr("class", "legend")
+		.attr("transform", function (d, i) {
+			return "translate(" + (i * width) / 8 + ",20)";
+		});
+
+	legend
+		.append("circle")
+		.attr("cx", 200)
+		.attr("cy", 0)
+		.attr("r", radius / 4)
+		// .attr("width", 18)
+		// .attr("height", 18)
+		.style("fill", colorScale);
+
+	legend
+		.append("text")
+		.attr("x", 210)
+		.attr("y", 0)
+		.attr("dy", ".35em")
+		.style("text-anchor", "start")
+		.text(function (d) {
+			return d;
 		});
 
 	///////////////////////////////////////////////////////////////////////////

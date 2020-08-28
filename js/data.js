@@ -57,10 +57,10 @@ var data = csv(url, (d) => {
 		victim_jurisdiction: d.Victim_jurisdiction,
 		us_me: d.US_military_effects,
 		military: d.Ongoing_military_confrontation,
-		command: d.Existence_of_Cyber_Command.trim(),
-		sector_i: d.CI_Sector.trim(),
-		sector_ii: d.CI_Sector.trim(),
-		sector_iii: d.CI_Sector.trim(),
+		command: d.Attack_cyber_command.trim(),
+		sector_i: d.Target_CI_sector.trim(),
+		sector_ii: d.Target_CI_sector_II.trim(),
+		sector_iii: d.Target_CI_sector_III.trim(),
 		dyad_from: split(d.Dyad, "-")[0],
 		dyad_to: split(d.Dyad, "-")[1]
 	};
