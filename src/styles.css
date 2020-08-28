@@ -44,11 +44,15 @@ h1 {
 	font-size: 1em;
 }
 
-/* .y-axis path {
-	stroke: #aaa;
+.y-axis line {
+	/* stroke: #eee;
 	stroke-width: 0.5;
-	shape-rendering: crispEdges;
-} */
+	shape-rendering: crispEdges; */
+	/* stroke: #eee; */
+	stroke: #c6c6c6;
+	/* font-weight: normal; */
+	/* text-color: #000; */
+}
 
 .tooltip {
 	/* background: white; */

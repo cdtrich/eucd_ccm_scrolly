@@ -97,14 +97,14 @@ csv(url, (d) => {
 		),
 		endLabel: d.End_day + "-" + d.End_month + "-" + d.End_year,
 		report: new Date(+d.Report_year, +d.Report_month, +d.Report_day),
-		reportDay: +d.Report_day,
-		reportMonth: +d.Report_month,
-		reportYear: +d.Report_year,
-		reportFix: new Date(
-			+d.Report_year,
-			+d.Report_month - 1,
-			replace(d.Report_day, "unknown", 1)
-		),
+		reportDay: d.Report_day,
+		reportMonth: d.Report_month,
+		reportYear: d.Report_year,
+		// reportFix: new Date(
+		// 	+d.Report_year,
+		// 	+d.Report_month - 1,
+		// 	replace(d.Report_day, "unknown", 1)
+		// ),
 		reportLabel: d.Report_day + "-" + d.Report_month + "-" + d.Report_year,
 		attacker_jurisdiction: d.Attack_jurisdiction,
 		target_jurisdiction: d.Target_jurisdiction,
