@@ -13,19 +13,19 @@
 //////////////////////////// dependencies /////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-// import * as d3 from "d3";
-import {
-	select,
-	extent,
-	scaleLinear,
-	// timeFormat,
-	axisBottom,
-	format,
-	forceSimulation,
-	forceX,
-	forceY,
-	forceCollide
-} from "d3";
+import * as d3 from "d3";
+// import {
+// 	select,
+// 	extent,
+// 	scaleLinear,
+// 	// timeFormat,
+// 	axisBottom,
+// 	format,
+// 	forceSimulation,
+// 	forceX,
+// 	forceY,
+// 	forceCollide
+// } from "d3";
 
 // import _ from "lodash";
 // Load the core build.
@@ -48,7 +48,8 @@ const radius = 15;
 const margin = { top: 20, right: 20, bottom: 20, left: 120 };
 // const svg = d3.create("svg")
 // .attr("viewBox", [0, 0, width, height]);
-const svg = select("#timeline_general") // id app
+const svg = d3
+	.select("#timeline_general") // id app
 	.append("svg")
 	// .attr("width", width)
 	// .attr("height", height)
@@ -64,7 +65,7 @@ const svg = select("#timeline_general") // id app
 // const t = d3.transition().duration(1500);
 
 // template
-var template = select("#template").html();
+var template = d3.select("#template").html();
 Mustache.parse(template);
 
 const url =
@@ -75,7 +76,7 @@ const url =
 //////////////////////////// data /////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-csv(url, (d) => {
+d3.csv(url, (d) => {
 	// console.log(d);
 	return {
 		id: d.CPI_CODE,
@@ -136,9 +137,10 @@ csv(url, (d) => {
 	//////////////////////////// scales ///////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////
 
-	const xScale = scaleLinear()
+	const xScale = d3
+		.scaleLinear()
 		.domain(
-			extent(data, (d) => {
+			d3.extent(data, (d) => {
 				return d.startYear;
 			})
 		)
@@ -146,15 +148,18 @@ csv(url, (d) => {
 
 	// console.log(xScale.domain(), xScale.range());
 
-	var simulation = forceSimulation(data)
+	var simulation = d3
+		.forceSimulation(data)
 		.force(
 			"x",
-			forceX(function (d) {
-				return xScale(d.startYear);
-			}).strength(0.99)
+			d3
+				.forceX(function (d) {
+					return xScale(d.startYear);
+				})
+				.strength(0.99)
 		)
-		.force("y", forceY(height).strength(0.05))
-		.force("collide", forceCollide(radius))
+		.force("y", d3.forceY(height).strength(0.05))
+		.force("collide", d3.forceCollide(radius))
 		.stop();
 	// this crashes
 	// .alphaDecay(0)
@@ -214,7 +219,7 @@ csv(url, (d) => {
 		.on("mouseover", (d, i) => {
 			var mouseX = event.pageX + 10;
 			var mouseY = event.pageY + 10;
-			select(".tooltip")
+			d3.select(".tooltip")
 				// .style("left", mouseX + "px")
 				// .style("top", mouseY  + "px")
 				// .style("opacity", 0)
@@ -226,27 +231,29 @@ csv(url, (d) => {
 				.style("top", mouseY + "px");
 			// console.log(d);
 			// name
-			select(".tooltip h2").text(d.name);
+			d3.select(".tooltip h2").text(d.name);
 			// date
-			select(".tooltip .date").text(
+			d3.select(".tooltip .date").text(
 				"from " + d.startLabel + " to " + d.endLabel
 			);
 			// name
-			select(".tooltip .type").text("type: " + d.us_me);
+			d3.select(".tooltip .type").text("type: " + d.us_me);
 			// attacker
-			select(".tooltip .attacker").text("attacker: " + d.attacker_jurisdiction);
+			d3.select(".tooltip .attacker").text(
+				"attacker: " + d.attacker_jurisdiction
+			);
 			// victim
-			select(".tooltip .target").text("target: " + d.name);
+			d3.select(".tooltip .target").text("target: " + d.name);
 		})
 		.on("mousemove", (d, i) => {
 			const mouseX = event.pageX + 10;
 			const mouseY = event.pageY + 10;
-			select(".tooltip")
+			d3.select(".tooltip")
 				.style("left", mouseX + "px")
 				.style("top", mouseY + "px");
 		})
 		.on("mouseout", function (d) {
-			select(".tooltip").style("visibility", "hidden");
+			d3.select(".tooltip").style("visibility", "hidden");
 		})
 		.on("click", showDetails);
 
@@ -255,9 +262,9 @@ csv(url, (d) => {
 	///////////////////////////////////////////////////////////////////////////
 
 	// axes
-	var formatAxis = format(".4r");
+	var formatAxis = d3.format(".4r");
 
-	const xAxis = axisBottom().scale(xScale).tickFormat(formatAxis);
+	const xAxis = d3.axisBottom().scale(xScale).tickFormat(formatAxis);
 
 	svg
 		.append("g")
@@ -273,20 +280,20 @@ csv(url, (d) => {
 function showDetails(f) {
 	var detailsHtml = Mustache.render(template, f);
 	// Hide the initial container.
-	select("#initial").classed("hidden", true);
+	d3.select("#initial").classed("hidden", true);
 	// Put the HTML output in the details container and show (unhide) it.
-	select("#details").html(detailsHtml);
-	select("#details").classed("hidden", false);
-	select("#details").on("click", hideDetails);
+	d3.select("#details").html(detailsHtml);
+	d3.select("#details").classed("hidden", false);
+	d3.select("#details").on("click", hideDetails);
 }
 
 function hideDetails() {
 	// Hide the details
 	// select("#details").attr("display", "none");
-	select("#details").classed("hidden", true);
+	d3.select("#details").classed("hidden", true);
 	// Show the initial content
 	// select("#initial").attr("display", "none");
-	select("#initial").classed("hidden", false);
+	d3.select("#initial").classed("hidden", false);
 }
 
 // select(HTMLAnchorElement).on("click", hideDetails);

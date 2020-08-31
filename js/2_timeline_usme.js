@@ -12,29 +12,29 @@
 //////////////////////////// dependencies /////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-// import * as d3 from "d3";
-import {
-	select,
-	extent,
-	scaleLinear,
-	timeFormat,
-	timeYear,
-	scaleBand,
-	scaleOrdinal,
-	line as _line,
-	mouse,
-	axisBottom,
-	axisLeft,
-	format,
-	forceSimulation,
-	forceX,
-	forceY,
-	forceCollide
-} from "d3";
+import * as d3 from "d3";
+// import {
+// 	select,
+// 	extent,
+// 	scaleLinear,
+// 	timeFormat,
+// 	timeYear,
+// 	scaleBand,
+// 	scaleOrdinal,
+// 	line as _line,
+// 	mouse,
+// 	axisBottom,
+// 	axisLeft,
+// 	format,
+// 	forceSimulation,
+// 	forceX,
+// 	forceY,
+// 	forceCollide
+// } from "d3";
 
 // import _ from "lodash";
 // Load the core build.
-import { forEach, chain, replace } from "lodash";
+import { forEach, chain } from "lodash";
 
 // import fetch as d3-fetch from "d3-fetch";
 import { csv } from "d3-fetch";
@@ -47,7 +47,8 @@ const width = 1200;
 const height = 300;
 const radius = 15;
 const margin = { top: 20, right: 20, bottom: 20, left: 120 };
-const svg = select("#timeline_usme") // id app
+const svg = d3
+	.select("#timeline_usme") // id app
 	.append("svg")
 	// .attr("width", width)
 	// .attr("height", height)
@@ -56,7 +57,7 @@ const svg = select("#timeline_usme") // id app
 	// .attr("viewBox", [-width / 2, -height / 2, width, height])
 	.style("overflow", "visible");
 
-var tooltip = select("#chart").append("div").attr("class", "tooltip hidden");
+var tooltip = d3.select("#chart").append("div").attr("class", "tooltip hidden");
 
 const colorsType = [
 	"#113655",
@@ -77,7 +78,7 @@ const url =
 //////////////////////////// data /////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-csv(url, (d) => {
+d3.csv(url, (d) => {
 	// console.log(d);
 	return {
 		id: d.CPI_CODE,
@@ -118,16 +119,17 @@ csv(url, (d) => {
 	///////////////////////////////////////////////////////////////////////////
 
 	// new time formats for tooltip
-	var formatDate = timeFormat("%d %b %Y");
+	var formatDate = d3.timeFormat("%d %b %Y");
 	// console.log(data);
 
 	///////////////////////////////////////////////////////////////////////////
 	//////////////////////////// scales ///////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////
 
-	const xScale = scaleLinear()
+	const xScale = d3
+		.scaleLinear()
 		.domain(
-			extent(data, (d) => {
+			d3.extent(data, (d) => {
 				return d.startYear;
 			})
 		)
@@ -141,24 +143,30 @@ csv(url, (d) => {
 		.value();
 	// console.log(dataAttacker);
 
-	const yScale = scaleBand()
+	const yScale = d3
+		.scaleBand()
 		.domain(dataAttacker)
 		.range([height - margin.bottom, margin.top]);
 
-	var simulation = forceSimulation(data)
+	var simulation = d3
+		.forceSimulation(data)
 		.force(
 			"x",
-			forceX(function (d) {
-				return xScale(d.startYear);
-			}).strength(0.935)
+			d3
+				.forceX(function (d) {
+					return xScale(d.startYear);
+				})
+				.strength(0.935)
 		)
 		.force(
 			"y",
-			forceY(function (d) {
-				return yScale(d.attacker_jurisdiction);
-			}).strength(0.99)
+			d3
+				.forceY(function (d) {
+					return yScale(d.attacker_jurisdiction);
+				})
+				.strength(0.99)
 		)
-		.force("collide", forceCollide(radius))
+		.force("collide", d3.forceCollide(radius))
 		.stop();
 
 	for (var i = 0; i < 10; ++i) simulation.tick();
@@ -179,7 +187,7 @@ csv(url, (d) => {
 		.value();
 	// console.log(dataType);
 
-	const colorScale = scaleOrdinal().domain(dataType).range(colorsType);
+	const colorScale = d3.scaleOrdinal().domain(dataType).range(colorsType);
 	// checking whether it computed correctly
 	// console.log(colorScale.domain(), colorScale.range());
 
@@ -187,11 +195,11 @@ csv(url, (d) => {
 	//////////////////////////// axes /////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////
 
-	var formatAxis = format(".4r");
+	var formatAxis = d3.format(".4r");
 
 	// axes
-	const xAxis = axisBottom().scale(xScale).tickFormat(formatAxis);
-	const yAxis = axisLeft().scale(yScale).tickSize(-width, width);
+	const xAxis = d3.axisBottom().scale(xScale).tickFormat(formatAxis);
+	const yAxis = d3.axisLeft().scale(yScale).tickSize(-width, width);
 
 	svg
 		.append("g")
@@ -231,7 +239,7 @@ csv(url, (d) => {
 		.on("mouseover", (d, i) => {
 			var mouseX = event.pageX + 10;
 			var mouseY = event.pageY + 10;
-			select(".tooltip")
+			d3.select(".tooltip")
 				// .style("left", mouseX + "px")
 				// .style("top", mouseY  + "px")
 				// .style("opacity", 0)
@@ -243,27 +251,29 @@ csv(url, (d) => {
 				.style("top", mouseY + "px");
 			// console.log(d);
 			// name
-			select(".tooltip h2").text(d.name);
+			d3.select(".tooltip h2").text(d.name);
 			// date
-			select(".tooltip .date").text(
+			d3.select(".tooltip .date").text(
 				"from " + d.startLabel + " to " + d.endLabel
 			);
 			// name
-			select(".tooltip .type").text("type: " + d.us_me);
+			d3.select(".tooltip .type").text("type: " + d.us_me);
 			// attacker
-			select(".tooltip .attacker").text("attacker: " + d.attacker_jurisdiction);
+			d3.select(".tooltip .attacker").text(
+				"attacker: " + d.attacker_jurisdiction
+			);
 			// victim
-			select(".tooltip .target").text("target: " + d.name);
+			d3.select(".tooltip .target").text("target: " + d.name);
 		})
 		.on("mousemove", (d, i) => {
 			const mouseX = event.pageX + 10;
 			const mouseY = event.pageY + 10;
-			select(".tooltip")
+			d3.select(".tooltip")
 				.style("left", mouseX + "px")
 				.style("top", mouseY + "px");
 		})
 		.on("mouseout", function (d) {
-			select(".tooltip").style("visibility", "hidden");
+			d3.select(".tooltip").style("visibility", "hidden");
 		});
 
 	///////////////////////////////////////////////////////////////////////////

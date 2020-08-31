@@ -9,22 +9,22 @@
 //////////////////////////// dependencies /////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-// import * as d3 from "d3";
-import {
-	select,
-	extent,
-	scaleLinear,
-	// timeFormat,
-	scaleOrdinal,
-	axisBottom,
-	format,
-	forceSimulation,
-	forceManyBody,
-	forceX,
-	forceY,
-	// forceRadial,
-	forceCollide
-} from "d3";
+import * as d3 from "d3";
+// import {
+// 	select,
+// 	extent,
+// 	scaleLinear,
+// 	// timeFormat,
+// 	scaleOrdinal,
+// 	axisBottom,
+// 	format,
+// 	forceSimulation,
+// 	forceManyBody,
+// 	forceX,
+// 	forceY,
+// 	// forceRadial,
+// 	forceCollide
+// } from "d3";
 
 // import _ from "lodash";
 // Load the core build.
@@ -41,7 +41,8 @@ const width = 1200;
 const height = 300;
 const radius = 15;
 const margin = { top: 20, right: 20, bottom: 20, left: 120 };
-const svg = select("#conflicts") // id app
+const svg = d3
+	.select("#conflicts") // id app
 	.append("svg")
 	// .attr("width", width)
 	// .attr("height", height)
@@ -73,7 +74,7 @@ const url =
 //////////////////////////// data /////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-csv(url, (d) => {
+d3.csv(url, (d) => {
 	// console.log(d);
 	return {
 		id: d.CPI_CODE,
@@ -135,9 +136,10 @@ csv(url, (d) => {
 	//////////////////////////// scales ///////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////
 
-	const xScale = scaleLinear()
+	const xScale = d3
+		.scaleLinear()
 		.domain(
-			extent(data, (d) => {
+			d3.extent(data, (d) => {
 				return d.startYear;
 			})
 		)
@@ -149,13 +151,17 @@ csv(url, (d) => {
 		.value();
 	// console.log(dataMilitary);
 
-	const sizeScale = scaleOrdinal().domain(dataMilitary).range([28, 21, 14, 7]);
+	const sizeScale = d3
+		.scaleOrdinal()
+		.domain(dataMilitary)
+		.range([28, 21, 14, 7]);
 
-	const colorScale = scaleOrdinal().domain(dataMilitary).range(colorsType);
+	const colorScale = d3.scaleOrdinal().domain(dataMilitary).range(colorsType);
 
 	// console.log(sizeScale.domain(), sizeScale.range());
 
-	var simulation = forceSimulation(data)
+	var simulation = d3
+		.forceSimulation(data)
 		// .force(
 		// 	"r",
 		// 	forceRadial(function (d) {
@@ -163,13 +169,13 @@ csv(url, (d) => {
 		// 	}).strength(0.001)
 		// )
 		// .force("charge", forceManyBody().strength(1))
-		.force("x", forceX((d) => xScale(d.startYear)).strength(0.935))
-		.force("y", forceY(height).strength(0.05))
+		.force("x", d3.forceX((d) => xScale(d.startYear)).strength(0.935))
+		.force("y", d3.forceY(height).strength(0.05))
 		// .force(
 		// 	"collide",
 		// 	forceCollide(d => sizeScale(d.radius)).strength(.05)
 		// )
-		.force("collide", forceCollide(radius * 1.75))
+		.force("collide", d3.forceCollide(radius * 1.75))
 		// .force("collide", forceCollide(radius))
 		// .alphaTarget(.05)
 		.stop();
@@ -224,7 +230,7 @@ csv(url, (d) => {
 		.on("mouseover", (d, i) => {
 			var mouseX = event.pageX + 10;
 			var mouseY = event.pageY + 10;
-			select(".tooltip")
+			d3.select(".tooltip")
 				// .style("left", mouseX + "px")
 				// .style("top", mouseY  + "px")
 				// .style("opacity", 0)
@@ -236,27 +242,29 @@ csv(url, (d) => {
 				.style("top", mouseY + "px");
 			// console.log(d);
 			// name
-			select(".tooltip h2").text(d.name);
+			d3.select(".tooltip h2").text(d.name);
 			// date
-			select(".tooltip .date").text(
+			d3.select(".tooltip .date").text(
 				"from " + d.startLabel + " to " + d.endLabel
 			);
 			// name
-			select(".tooltip .type").text("type: " + d.us_me);
+			d3.select(".tooltip .type").text("type: " + d.us_me);
 			// attacker
-			select(".tooltip .attacker").text("attacker: " + d.attacker_jurisdiction);
+			d3.select(".tooltip .attacker").text(
+				"attacker: " + d.attacker_jurisdiction
+			);
 			// victim
-			select(".tooltip .target").text("target: " + d.name);
+			d3.select(".tooltip .target").text("target: " + d.name);
 		})
 		.on("mousemove", (d, i) => {
 			const mouseX = event.pageX + 10;
 			const mouseY = event.pageY + 10;
-			select(".tooltip")
+			d3.select(".tooltip")
 				.style("left", mouseX + "px")
 				.style("top", mouseY + "px");
 		})
 		.on("mouseout", function (d) {
-			select(".tooltip").style("visibility", "hidden");
+			d3.select(".tooltip").style("visibility", "hidden");
 		});
 
 	///////////////////////////////////////////////////////////////////////////
@@ -297,9 +305,9 @@ csv(url, (d) => {
 	///////////////////////////////////////////////////////////////////////////
 
 	// axes
-	var formatAxis = format(".4r");
+	var formatAxis = d3.format(".4r");
 
-	const xAxis = axisBottom().scale(xScale).tickFormat(formatAxis);
+	const xAxis = d3.axisBottom().scale(xScale).tickFormat(formatAxis);
 
 	svg
 		.append("g")
