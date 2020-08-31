@@ -10,9 +10,6 @@ h1 {
 	text-transform: uppercase;
 }
 
-body {
-	overflow: hidden;
-}
 #story {
 	float: right;
 	width: 66%;
