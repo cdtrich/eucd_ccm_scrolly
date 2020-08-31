@@ -9,7 +9,7 @@
 //////////////////////////// dependencies /////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-import * as d3 from "d3";
+// import * as d3 from "d3.v5.min.js";
 // import {
 // 	select,
 // 	extent,
@@ -28,10 +28,10 @@ import * as d3 from "d3";
 
 // import _ from "lodash";
 // Load the core build.
-import { replace, chain } from "lodash";
+// import { replace, chain } from "lodash";
 
 // import fetch as d3-fetch from "d3-fetch";
-import { csv } from "d3-fetch";
+// import { csv } from "d3-fetch";
 
 ///////////////////////////////////////////////////////////////////////////
 //////////////////////////// Set up svg ///////////////////////////////////
@@ -84,7 +84,7 @@ d3.csv(url, (d) => {
 		startFix: new Date(
 			+d.Start_year,
 			+d.Start_month - 1,
-			replace(d.Start_day, "unknown", 1)
+			_.replace(d.Start_day, "unknown", 1)
 		),
 		startLabel: d.Start_day + "-" + d.Start_month + "-" + d.Start_year,
 		end: new Date(+d.End_year, +d.End_month, +d.end_day),
@@ -92,7 +92,7 @@ d3.csv(url, (d) => {
 		endFix: new Date(
 			+d.End_year,
 			+d.End_month - 1,
-			replace(d.End_day, "unknown", 1)
+			_.replace(d.End_day, "unknown", 1)
 		),
 		endLabel: d.end_day + "-" + d.End_month + "-" + d.End_year,
 		report: new Date(+d.Report_year, +d.Report_month, +d.Report_day),
@@ -145,7 +145,7 @@ d3.csv(url, (d) => {
 		)
 		.range([margin.left, width - margin.right]);
 
-	const dataMilitary = chain(data)
+	const dataMilitary = _.chain(data)
 		.map((d) => d.military)
 		.uniq()
 		.value();

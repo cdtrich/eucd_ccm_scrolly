@@ -12,7 +12,7 @@
 //////////////////////////// dependencies /////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-import * as d3 from "d3";
+// import * as d3 from "d3";
 // import {
 // 	select,
 // 	extent,
@@ -34,10 +34,10 @@ import * as d3 from "d3";
 
 // import _ from "lodash";
 // Load the core build.
-import { forEach, chain } from "lodash";
+// import { forEach, chain } from "lodash";
 
 // import fetch as d3-fetch from "d3-fetch";
-import { csv } from "d3-fetch";
+// import { csv } from "d3-fetch";
 
 ///////////////////////////////////////////////////////////////////////////
 //////////////////////////// Set up svg ///////////////////////////////////
@@ -110,7 +110,7 @@ d3.csv(url, (d) => {
 	// data = _.head(data);
 
 	// crappy stuxnet fix
-	data = forEach(data, function (value) {
+	data = _.forEach(data, function (value) {
 		value.startYear = value.name === "Stuxnet" ? 2010 : value.startYear;
 	});
 
@@ -137,7 +137,7 @@ d3.csv(url, (d) => {
 
 	// y - attackers (by jurisdiction)
 	//// unique attackers
-	const dataAttacker = chain(data)
+	const dataAttacker = _.chain(data)
 		.map((d) => d.attacker_jurisdiction)
 		.uniq()
 		.value();
@@ -181,7 +181,7 @@ d3.csv(url, (d) => {
 
 	// color - types of attacks (US M+D)
 	//// unique types
-	const dataType = chain(data)
+	const dataType = _.chain(data)
 		.map((d) => d.us_me)
 		.uniq()
 		.value();
