@@ -270,14 +270,14 @@ csv(url, (d) => {
 		.append("g")
 		.attr("class", "legend")
 		.attr("transform", function (d, i) {
-			return "translate(" + (i * width) / 8 + ",20)";
+			return "translate(" + (i * width) / 6 + ",20)";
 		});
 
 	legend
 		.append("circle")
 		.attr("cx", 200)
 		.attr("cy", 0)
-		.attr("r", radius / 4)
+		.attr("r", radius / 2)
 		// .attr("width", 18)
 		// .attr("height", 18)
 		.style("fill", colorScale);
