@@ -1,11 +1,11 @@
 /* general */
 * {
-	font-family: "Source Code Pro", monospace;
+	font-family: "Roboto Condensed", sans-serif;
 	font-size: 1em;
 }
 
 h1 {
-	font-family: "Source Sans Pro", sans-serif;
+	font-family: "Roboto Condensed", sans-serif;
 	font-size: 3em;
 	text-transform: uppercase;
 }
